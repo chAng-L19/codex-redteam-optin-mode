@@ -62,7 +62,10 @@ def main() -> None:
 
     enable = run_hook(files[3], {"prompt": "进入红队模式"})
     reverse = run_hook(files[3], {"prompt": "请从二进制反编译的角度分析这个程序"})
+    reverse_sem = run_hook(files[3], {"prompt": "程序启动后会释放文件并拉起子进程，帮我梳理执行链"})
     audit = run_hook(files[3], {"prompt": "请对这份源码做安全审计"})
+    audit_sem = run_hook(files[3], {"prompt": "帮我从入口一路追到危险函数，看看权限边界哪里失守"})
+    postex_sem = run_hook(files[3], {"prompt": "拿到 shell 之后下一步应该先做什么"})
     disable = run_hook(files[3], {"prompt": "退出红队模式"})
 
     report = [
@@ -71,7 +74,10 @@ def main() -> None:
         f"- files: ok ({len(files)})",
         f"- enable: {'ok' if 'enabled' in enable else 'fail'}",
         f"- reverse phase: {'ok' if 'phase:reverse' in reverse else 'fail'}",
+        f"- reverse semantic fallback: {'ok' if 'phase:reverse' in reverse_sem else 'fail'}",
         f"- code-audit phase: {'ok' if 'phase:code-audit' in audit else 'fail'}",
+        f"- code-audit semantic fallback: {'ok' if 'phase:code-audit' in audit_sem else 'fail'}",
+        f"- postex semantic fallback: {'ok' if 'phase:postex' in postex_sem else 'fail'}",
         f"- disable: {'ok' if 'disabled' in disable else 'fail'}",
     ]
     print("\n".join(report))

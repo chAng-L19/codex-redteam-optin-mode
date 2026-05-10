@@ -67,6 +67,40 @@ def extract_prompt(payload: Any) -> str:
     return ""
 
 
+SESSION_ID_KEYS = (
+    "session_id",
+    "sessionId",
+    "thread_id",
+    "threadId",
+    "conversation_id",
+    "conversationId",
+    "chat_id",
+    "chatId",
+    "id",
+)
+
+
+def extract_session_id(payload: Any) -> Optional[str]:
+    if isinstance(payload, str):
+        return None
+    if isinstance(payload, dict):
+        for key in SESSION_ID_KEYS:
+            value = payload.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        for key in ("context", "session", "thread", "conversation", "metadata", "_meta", "meta"):
+            nested = payload.get(key)
+            found = extract_session_id(nested)
+            if found:
+                return found
+    if isinstance(payload, list):
+        for item in payload:
+            found = extract_session_id(item)
+            if found:
+                return found
+    return None
+
+
 def parse_mode_command(prompt: str) -> Optional[str]:
     for pat, mode in ENABLE_PATTERNS:
         if re.search(pat, prompt, re.I):

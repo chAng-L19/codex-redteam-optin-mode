@@ -1,6 +1,12 @@
 from __future__ import annotations
 
 import re
+from typing import Optional
+
+from .semantic_phase import classify_phase_semantically
+
+
+SEMANTIC_THRESHOLD = 0.10
 
 
 PHASE_HINTS = {
@@ -15,20 +21,31 @@ PHASE_HINTS = {
 
 
 SECURITY_PATTERNS = [
-    ("web", [r"xss", r"sqli", r"ssrf", r"ssti", r"idor", r"csrf", r"xxe", r"burp", r"repeater", r"proxy", r"graphql", r"注入", r"越权"]),
-    ("ad", [r"kerberos", r"ntlm", r"adcs", r"bloodhound", r"域控", r"横向", r"委派", r"票据", r"凭证"]),
-    ("postex", [r"post[- ]?ex", r"foothold", r"privilege escalation", r"lateral movement", r"提权", r"后渗透"]),
-    ("reverse", [r"reverse", r"malware", r"dropper", r"stager", r"loader", r"木马", r"样本", r"逆向", r"反编译", r"二进制"]),
-    ("code-audit", [r"code audit", r"审计", r"源码", r"source code", r"middleware", r"handler", r"controller", r"grep", r"静态分析"]),
-    ("payload", [r"payload", r"shellcode", r"staged", r"stageless", r"载荷"]),
+    ("web", [r"\bxss\b", r"\bsqli\b", r"\bssrf\b", r"\bssti\b", r"\bidor\b", r"\bcsrf\b", r"\bxxe\b", r"\bburp\b", r"\brepeater\b", r"\bproxy\b", r"\bgraphql\b", r"注入", r"越权"]),
+    ("ad", [r"\bkerberos\b", r"\bntlm\b", r"\badcs\b", r"\bbloodhound\b", r"域控", r"横向", r"委派", r"票据", r"凭证"]),
+    ("postex", [r"\bpost[- ]?ex\b", r"\bfoothold\b", r"privilege escalation", r"lateral movement", r"提权", r"后渗透"]),
+    ("reverse", [r"\breverse\b", r"\bmalware\b", r"\bdropper\b", r"\bstager\b", r"\bloader\b", r"木马", r"样本", r"逆向", r"反编译", r"二进制"]),
+    ("code-audit", [r"code audit", r"审计", r"源码", r"source code", r"middleware", r"handler", r"controller", r"\bgrep\b", r"静态分析"]),
+    ("payload", [r"\bpayload\b", r"\bshellcode\b", r"\bstaged\b", r"\bstageless\b", r"载荷"]),
 ]
 
 
-def detect_phase(prompt: str) -> str:
+def detect_phase_rule_based(prompt: str) -> Optional[str]:
     for phase, patterns in SECURITY_PATTERNS:
         for pat in patterns:
             if re.search(pat, prompt, re.I):
                 return phase
+    return None
+
+
+def detect_phase(prompt: str) -> str:
+    matched = detect_phase_rule_based(prompt)
+    if matched:
+        return matched
+
+    phase, score = classify_phase_semantically(prompt)
+    if phase and score >= SEMANTIC_THRESHOLD:
+        return phase
     return "general"
 
 

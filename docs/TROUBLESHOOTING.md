@@ -11,3 +11,8 @@
 ## Session feels polluted
 - red-team mode should be explicit only
 - start a new session to confirm reset
+
+## Two sessions affect each other
+- this should no longer happen in `0.2.0`
+- verify the state directory uses per-session files under your temp directory
+- run `python scripts/validate.py` to confirm current behavior

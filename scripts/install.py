@@ -4,6 +4,7 @@ import argparse
 import os
 import platform
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -75,9 +76,18 @@ def copy_tree(src: Path, dst: Path, dry_run: bool) -> None:
 def render_hooks_template(repo_root: Path, codex_home: Path, dry_run: bool) -> None:
     src = repo_root / "templates" / "hooks.json.template"
     dst = codex_home / "hooks.json"
-    text = src.read_text(encoding="utf-8").replace("{{CODEX_HOME_WIN}}", str(codex_home).replace("\\", "\\\\"))
+    python_cmd = "python" if os.name == "nt" else "python3"
+    script_dir = str(codex_home / "hooks")
+    if os.name == "nt":
+        script_dir = script_dir.replace("\\", "\\\\")
+    text = (
+        src.read_text(encoding="utf-8")
+        .replace("{{PYTHON_CMD}}", python_cmd)
+        .replace("{{CODEX_HOOKS_DIR}}", script_dir)
+    )
     info(f"render {src} -> {dst}")
     if not dry_run:
+        dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(text, encoding="utf-8")
 
 
@@ -85,7 +95,10 @@ def run_validate(repo_root: Path, codex_home: Path, dry_run: bool) -> None:
     if dry_run:
         return
     validate = repo_root / "scripts" / "validate.py"
-    os.system(f'"{sys.executable}" "{validate}" --codex-home "{codex_home}"')
+    subprocess.run(
+        [sys.executable, str(validate), "--codex-home", str(codex_home)],
+        check=True,
+    )
 
 
 def uninstall(repo_root: Path, codex_home: Path, agents_home: Path, dry_run: bool) -> None:
