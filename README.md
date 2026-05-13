@@ -130,6 +130,10 @@ python3 scripts/install.py
 /redteam full
 enable red team mode
 ```
+### Entering Forced Red Team Mode
+
+After enabling Reteam on:
+Enter Redteam Full
 
 ### Disable red-team mode
 
@@ -258,11 +262,15 @@ The project validates:
 
 ## Thanks / Contributions
 
-感谢米斯特安全团队的浩熙大佬提出的修改意见：加入语义判定。  
-浩熙X：@xishan12509850
+Thanks to Mingxi from the Mister Security team for the suggestion to add semantic checks.
+Mingxi X: @xishan12509850
 
-感谢 `qiushi-skill`、`hack-skills` 与 `Anthropic-Cybersecurity-Skills` 提供的方法层、技术路由层与 skill pack 结构参考。  
-参考项目：`qiushi-skill` / `yaklang/hack-skills` / `mukul975/Anthropic-Cybersecurity-Skills`
+Thanks to Nirvana for the suggestion to optimize the workflow and enable overwrite installation.
+Nirvana X: @Nirvana_543
+
+Thanks to `qiushi-skill`, `hack-skills`, and `Anthropic-Cybersecurity-Skills` for providing the method layer, technology routing layer, and skill pack structure reference.
+
+Reference projects: `qiushi-skill` / `yaklang/hack-skills` / `mukul975/Anthropic-Cybersecurity-Skills`
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
