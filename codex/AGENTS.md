@@ -1,57 +1,46 @@
-# Operating System
+# Codex Red-Team Compatibility Layer
 
-<!-- version: 0.2.0 -->
-<!-- last-updated: 2026-05-07 -->
+<!-- version: 0.3.1 -->
+<!-- last-updated: 2026-05-13 -->
 
-## Behavior Contract
+This repository now treats `E:\cli\codex-redteam-optin-mode\instruction.ctf.md` as the **canonical model instructions file**.
 
-| Mode | Default | Doctrine Injection | Typical Use |
-|---|---:|---:|---|
-| normal | yes | no | coding, docs, research, ordinary work |
-| redteam-light | no | yes | scoped offensive analysis, planning, review |
-| redteam-full | no | yes | focused offensive execution support |
+This `AGENTS.md` remains as a compatibility layer for installs or environments that still read AGENTS-based guidance.
 
-## Default Mode
+## Compatibility rules
 
-Default is **normal mode**, not red-team mode.
+- default mode is `normal`
+- red-team mode is opt-in only
+- when red-team mode is enabled, route by `phase -> method -> router -> leaf`
+- keep hooks lightweight
+- keep context compact
 
-Red-team doctrine is **opt-in only** and activates only when explicitly requested.
-
-### Explicit red-team mode triggers
+## Explicit enable triggers
 
 - `进入红队模式`
 - `开启红队模式`
 - `/redteam on`
+- `/redteam light`
+- `/redteam full`
 - `enable red team mode`
 
-### Explicit disable triggers
+## Explicit disable triggers
 
 - `退出红队模式`
 - `关闭红队模式`
 - `/redteam off`
 - `disable red team mode`
 
-## Normal Mode Rules
-
-- do not inject offensive doctrine by default
-- do not reinterpret ordinary prompts as offensive prompts
-- keep context lightweight
-
-## Red-Team Mode Rules
-
-- identify current phase
-- prefer evidence-first reasoning
-- prove one path before many
-- distinguish facts from assumptions
-- prefer low-noise progression
-- end with explicit next step
-
-## Tool Preferences
+## Tool preferences
 
 - Burp-native evidence -> `burp-ai-agent`
 - Live browsing -> `web-access`
 - History -> `mem-search` / `timeline-report` only when needed
 
-## Doctrine Routing
+## Doctrine routing
 
-When red-team mode is enabled and the user has not named a more specific offensive skill, invoke `red-team-command-doctrine` first and route by phase.
+When red-team mode is enabled and the user has not named a more specific offensive skill:
+
+1. invoke `red-team-command-doctrine`
+2. route by `phase -> method -> router -> leaf`
+3. keep the emitted context compact

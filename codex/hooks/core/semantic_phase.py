@@ -9,49 +9,57 @@ from typing import Iterable
 
 PHASE_EXAMPLES: dict[str, list[str]] = {
     "web": [
-        "trace one exploit path through requests, parameters, session state, and hidden endpoints",
+        "trace one exploit path through requests parameters session state and hidden endpoints",
         "analyze a web vulnerability chain with reproduction steps and request order",
         "review this burp traffic and determine whether the issue is exploitable",
-        "梳理这个接口的鉴权、参数污染和请求顺序，证明一条可利用链",
-        "分析网页交互、隐藏参数、会话状态和漏洞复现路径",
-        "梳理登录流程、鉴权边界、会话状态和请求顺序",
+        "梳理这个接口的鉴权 会话状态 隐藏参数和请求顺序 证明一条可利用链",
+        "分析网页登录 流量 边界检查 和漏洞复现路径",
+        "审查 burp 数据包 鉴权边界 API 行为和参数污染",
     ],
     "ad": [
-        "map trust edges, sessions, credential opportunities, and the lowest-noise path through active directory",
-        "reason about kerberos, delegation, acl abuse, and lateral movement in a windows domain",
+        "map trust edges sessions credential opportunities and the lowest-noise path through active directory",
+        "reason about kerberos delegation acl abuse and lateral movement in a windows domain",
         "identify the next quiet step in an ad attack chain using sessions and permissions",
-        "分析域控环境中的委派、票据、会话和 ACL 路径",
-        "在 AD 里找最小噪声的凭证复用和横向链路",
+        "分析域控环境中的委派 票据 会话和 ACL 路径",
+        "在 AD 中寻找最小噪声的凭证复用和横向链路",
     ],
     "postex": [
-        "triage a foothold for privilege escalation, credential reuse, and next-hop value",
+        "triage a foothold for privilege escalation credential reuse and next-hop value",
         "evaluate what to do after code execution on a host",
-        "reason about host enumeration, privesc, and post exploitation priorities",
-        "拿到 foothold 后判断提权、凭证收集和下一跳价值",
+        "reason about host enumeration privesc and post exploitation priorities",
+        "拿到 foothold 后判断提权 凭证收集和下一跳价值",
         "后渗透阶段如何做主机分诊和推进",
-        "拿到 shell 之后先做什么，如何继续后渗透和主机分诊",
+        "拿到 shell 之后先做什么 如何继续后渗透和主机分诊",
     ],
     "reverse": [
-        "recover the execution chain of a binary, loader, or malware sample",
-        "analyze unpacking, configuration extraction, process launch sequence, and binary logic",
-        "reverse engineer the program to understand stages, callbacks, and operator tradecraft",
-        "分析样本执行链、释放逻辑、配置提取和子进程拉起",
-        "从逆向角度梳理二进制的控制流、载荷和行为链",
-        "程序解压资源后释放文件并启动新进程，梳理执行链和行为逻辑",
+        "recover the execution chain of a binary loader or malware sample",
+        "analyze unpacking configuration extraction process launch sequence and binary logic",
+        "reverse engineer the program to understand stages callbacks and operator tradecraft",
+        "分析样本执行链 释放逻辑 配置提取和子进程拉起",
+        "从逆向角度梳理二进制的控制流 载荷和行为链",
+        "程序启动后会释放文件并拉起子进程 帮我梳理执行链和行为逻辑",
     ],
     "code-audit": [
-        "trace one controllable input to a dangerous sink across handlers, middleware, and trust boundaries",
-        "review source code for auth, permission logic, hidden trust shortcuts, and a precise proof path",
+        "trace one controllable input to a dangerous sink across handlers middleware and trust boundaries",
+        "review source code for auth permission logic hidden trust shortcuts and a precise proof path",
         "analyze code structure to find an exploitable path from entrypoint to sink",
-        "从源码入口追到危险函数，检查鉴权、边界和信任假设",
-        "做代码审计，梳理 controller、middleware 和 sink 之间的一条漏洞路径",
+        "从源码入口追到危险函数 检查鉴权 边界和信任假设",
+        "做代码审计 梳理 controller middleware 和 sink 之间的一条漏洞路径",
+        "帮我从入口一路追到危险函数 看看权限边界哪里失守",
     ],
     "payload": [
-        "choose payload shape, launcher format, staged versus stageless tradeoffs, and delivery constraints",
-        "reason about shellcode, loaders, and the best payload format for the target",
+        "choose payload shape launcher format staged versus stageless tradeoffs and delivery constraints",
+        "reason about shellcode loaders and the best payload format for the target",
         "compare delivery formats and operator tradeoffs for an implant or launcher",
-        "选择载荷形态、staged 或 stageless、以及投递格式",
-        "比较 shellcode、launcher 和 payload 方案的适配性",
+        "选择载荷形态 staged 或 stageless 以及投递格式",
+        "比较 shellcode launcher 和 payload 方案的适配性",
+    ],
+    "evasion": [
+        "plan av edr waf or sandbox bypass techniques with low-noise tradeoffs",
+        "evaluate defender bypass options and operational constraints",
+        "reason about waf bypass header tricks request shaping and av evasion",
+        "分析免杀 绕过 对抗和低噪声规避路径",
+        "对比 WAF 绕过 AV EDR 规避和沙箱逃逸策略",
     ],
 }
 
@@ -103,10 +111,7 @@ def _cosine(a: Counter[str], b: Counter[str]) -> float:
 
 @lru_cache(maxsize=1)
 def _phase_prototypes() -> dict[str, Counter[str]]:
-    return {
-        phase: _vectorize(" ".join(examples))
-        for phase, examples in PHASE_EXAMPLES.items()
-    }
+    return {phase: _vectorize(" ".join(examples)) for phase, examples in PHASE_EXAMPLES.items()}
 
 
 def classify_phase_semantically(prompt: str) -> tuple[str | None, float]:

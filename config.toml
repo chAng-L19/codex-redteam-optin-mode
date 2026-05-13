@@ -1,0 +1,2 @@
+# Codex red-team profile
+model_instructions_file = './instruction.ctf.md'

@@ -1,5 +1,8 @@
 # Example only. Merge carefully into your real config.toml.
 
+# Codex red-team profile
+model_instructions_file = './instruction.ctf.md'
+
 [features]
 codex_hooks = true
 

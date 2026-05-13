@@ -6,23 +6,24 @@ from typing import Any, Optional
 
 
 ENABLE_PATTERNS = [
+    (r"/redteam\s+full\b", "redteam-full"),
+    (r"/redteam\s+light\b", "redteam-light"),
     (r"进入红队模式", "redteam-light"),
     (r"开启红队模式", "redteam-light"),
-    (r"/redteam\s+on", "redteam-light"),
+    (r"/redteam\s+on\b", "redteam-light"),
     (r"enable\s+red\s*team\s*mode", "redteam-light"),
-    (r"/redteam\s+full", "redteam-full"),
 ]
 
 DISABLE_PATTERNS = [
     r"退出红队模式",
     r"关闭红队模式",
-    r"/redteam\s+off",
+    r"/redteam\s+off\b",
     r"disable\s+red\s*team\s*mode",
 ]
 
 OPSEC_PATTERNS = [
-    (r"/opsec\s+strict", "strict"),
-    (r"/opsec\s+balanced", "balanced"),
+    (r"/opsec\s+strict\b", "strict"),
+    (r"/opsec\s+balanced\b", "balanced"),
 ]
 
 

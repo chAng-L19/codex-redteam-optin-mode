@@ -22,7 +22,11 @@ def main() -> None:
             session_id = None
 
     reset_runtime_state(session_id=session_id)
-    context = "[mode] Default session mode is normal. Red-team mode is disabled unless the user explicitly enables it with phrases like 进入红队模式 or /redteam on."
+    context = (
+        "[mode] Default session mode is normal. Red-team mode is disabled unless the user explicitly enables it "
+        "with phrases like 进入红队模式 or /redteam on. When enabled, runtime guidance stays lightweight and routes by "
+        "phase -> method -> router -> leaf."
+    )
     print(emit_hook_json("SessionStart", context))
 
 

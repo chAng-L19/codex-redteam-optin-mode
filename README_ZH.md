@@ -4,10 +4,9 @@
 
 > **默认普通模式。只有在你明确开启时，才进入红队模式。**
 
-这是一个面向 Codex 的**轻量级、阶段感知型红队配置层**。
-**此项目仅为辅助红队测试的思路工具，未达到自动化渗透agent的层面**
+这是一个面向 Codex 的**轻量级、分层路由型红队配置层**。
 
-它默认保持 **normal mode**，只有你显式开启时，才会进入 **red-team routing**。项目提供：
+项目默认保持 **normal mode**，只有你显式开启时，才会进入 **red-team routing**。当前提供：
 
 - opt-in 红队模式
 - 轻量 hooks
@@ -15,7 +14,9 @@
 - 规则优先 + 语义兜底的 phase 检测
 - 会话隔离状态
 - 结构化红队任务编排
-- 面向多阶段任务的 review gate
+- **phase → method → router → leaf** 四层路由
+- 对 `qiushi-skill`、`hack-skills`、`Anthropic-Cybersecurity-Skills` 的结构化集成参考
+- 根目录 `config.toml` + `instruction.ctf.md` 提示词布局
 
 ---
 
@@ -31,7 +32,7 @@
 - **普通模式保持普通**
 - **红队模式必须显式开启**
 - **hooks 保持轻量**
-- **phase 路由保持克制**
+- **路由保持分层与克制**
 
 ---
 
@@ -41,16 +42,28 @@
   - 默认是 normal mode
   - 必须显式开启才进入 red-team mode
 
-- **阶段感知**
+- **分层路由**
+  - phase
+  - method
+  - router
+  - leaf
+
+- **skill 集成**
+  - `qiushi-skill` → 方法层
+  - `hack-skills` → 技术路由层
+  - `Anthropic-Cybersecurity-Skills` → skill pack 结构与 progressive disclosure 参考
+
+- **扩展后的红队域**
   - web
   - ad
   - postex
   - reverse
   - code-audit
   - payload
+  - evasion
 
 - **规则优先 + 语义兜底**
-  - 明确命令与强特征优先命中
+  - 显式命令与强特征优先命中
   - 对自然语言表达使用轻量语义兜底
 
 - **会话隔离**
@@ -67,12 +80,23 @@
 - **可验证**
   - 安装验证
   - hook 验证
+  - router 验证
   - orchestration gate 验证
   - 普通模式洁净性验证
 
 ---
 
 ## 安装
+
+安装器现在默认执行**托管式增量安装**：
+
+- 保留用户原有的 `AGENTS.md` 与 `hooks.json`
+- 在 `AGENTS.md` 中增量注入本项目的托管区块
+- 在 `hooks.json` 中增量注入本项目的托管 hooks
+- 直接删除旧版本遗留的托管运行时代码路径
+- 再写入当前版本运行时代码
+- 写入本地 install manifest 供后续升级使用
+- 安装后自动运行 validate
 
 ### Python
 
@@ -102,6 +126,8 @@ python3 scripts/install.py
 进入红队模式
 开启红队模式
 /redteam on
+/redteam light
+/redteam full
 enable red team mode
 ```
 
@@ -141,20 +167,18 @@ python scripts/validate.py
 - 不做巨型 prompt 注入
 - 不做 always-on offensive 偏置
 
-### 3. Phase 检测
+### 3. 分层路由
 
-phase 检测**不是纯 regex**。
+运行时现在会发出紧凑的 route envelope：
 
-当前顺序是：
-
-1. 显式规则优先
-2. 轻量语义兜底
-
-示例：
-
-- `程序启动后会释放文件并拉起子进程，帮我梳理执行链` → `reverse`
-- `帮我从入口一路追到危险函数，看看权限边界哪里失守` → `code-audit`
-- `拿到 shell 之后下一步应该先做什么` → `postex`
+```text
+[security:redteam]
+[mode:redteam-light]
+[phase:web]
+[method:investigation-first]
+[router:auth-sec]
+[leaf:jwt-oauth-token-attacks]
+```
 
 ### 4. 结构化任务编排
 
@@ -175,17 +199,31 @@ recon -> strategy -> exploit-dev -> review -> reporting
 
 ```text
 .github/
+config.toml
+instruction.ctf.md
 agents/
   skills/
     red-team-command-doctrine/
 codex/
   AGENTS.md
   hooks/
+  router/
   orchestrator/
 docs/
 scripts/
 templates/
 tests/
+```
+
+当前仓库的**主提示词文件**改为：
+
+- `./instruction.ctf.md`
+
+根目录 `config.toml` 现在指向：
+
+```toml
+# Codex red-team profile
+model_instructions_file = './instruction.ctf.md'
 ```
 
 ---
@@ -196,6 +234,7 @@ tests/
 
 - 模式开启/关闭
 - phase 路由
+- method / router / leaf 路由
 - 语义 fallback
 - 普通模式洁净性
 - 会话隔离
@@ -207,34 +246,28 @@ tests/
 
 - 它是一个**控制层 / 配置层**，不是完整攻击平台
 - 不包含 RAG 或私有知识库检索
-- `redteam-light` 与 `redteam-full` 目前行为还未拉开
 - 实际执行深度仍依赖你的 MCP / 工具面
 
 ---
-## ⚠️ 免责声明 / Disclaimer
 
-**本项目仅供授权渗透测试（Authorized Penetration Testing）和安全研究使用。**
+## ⚠️ 免责声明
 
-### 重要声明
-- 本工具 **仅限** 在您拥有 **明确书面授权** 的目标系统或环境中使用。
-- 未经授权擅自用于任何生产系统、他人资产或非授权目标，属于违法行为，作者及贡献者不承担任何责任。
-- 使用本项目即表示您同意自行承担所有风险，包括但不限于法律责任、数据泄露、系统损坏等后果。
-- 作者及本项目不提供任何明示或暗示的担保，包括但不限于适销性、特定用途适用性及不侵权。
+**本项目仅供授权渗透测试（Authorized Penetration Testing）、红队研究与防御性安全实验使用。**
 
-### Legal & Ethical Use Only
-This project is intended **solely for educational purposes, authorized red team operations, and legal penetration testing** where you have explicit permission from the system owner.
-
-- Any unauthorized use, including but not limited to attacking systems without consent, is strictly prohibited.
-- The authors and contributors assume **no liability** for any damages, legal consequences, or losses resulting from the use or misuse of this tool.
-- Users are fully responsible for ensuring their activities comply with all applicable local, national, and international laws.
-
-**继续使用本项目 = 您已阅读、理解并同意以上全部条款。**
+- 仅限在你拥有明确授权的系统或环境中使用。
+- 未经授权用于第三方或生产系统属于禁止行为。
+- 作者及贡献者对误用、法律后果、服务中断或数据损失 **不承担任何责任**。
+- 使用本项目即表示你同意自行承担全部风险，并确保行为符合适用法律和规则。
 
 ---
 
-**如果您无法确保合法授权，请立即停止使用本项目。**
-不需要回复，我存一下免责声明
-## 贡献
+## 贡献与致谢
+
+感谢米斯特安全团队的洺熙大佬提出的修改意见：加入语义判定。  
+洺熙X：@xishan12509850
+
+感谢 `qiushi-skill`、`hack-skills` 与 `Anthropic-Cybersecurity-Skills` 提供的方法层、技术路由层与 skill pack 结构参考。  
+参考项目：`qiushi-skill` / `yaklang/hack-skills` / `mukul975/Anthropic-Cybersecurity-Skills`
 
 见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 
